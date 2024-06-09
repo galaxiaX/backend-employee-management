@@ -75,16 +75,17 @@ app
 
 app.route("/update/(:id)").put(async (req: ReqBodyType<EmployeeType>, res) => {
   try {
-    const { _id, ...rest } = req.body;
-    // if (!mongoose.Types.ObjectId.isValid(_id)) {
-    //   throw { status: 422, message: "ID is not valid" };
-    // }
+    const bodyData = req.body;
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw { status: 422, message: "ID is not valid" };
+    }
 
-    const foundedList = await Employee.findById(_id);
+    const foundedList = await Employee.findById(id);
     if (!foundedList) throw { status: 404, message: "Employee not found" };
 
     foundedList.set({
-      ...rest,
+      ...bodyData,
     });
     const data = await foundedList.save();
 
@@ -95,25 +96,23 @@ app.route("/update/(:id)").put(async (req: ReqBodyType<EmployeeType>, res) => {
   }
 });
 
-app
-  .route("/delete/(:id)")
-  .delete(async (req: ReqBodyType<{ _id: string }>, res) => {
-    try {
-      const { _id } = req.body;
-      // if (!mongoose.Types.ObjectId.isValid(_id)) {
-      //   throw { status: 422, message: "ID is not valid" };
-      // }
+app.route("/delete/(:id)").delete(async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(req.body);
 
-      const foundedEmployee = await Employee.findById(_id);
-      if (!foundedEmployee)
-        throw { status: 404, message: "Employee not found" };
-
-      const deletedEmployee = await Employee.findByIdAndDelete(_id);
-      res.json({ message: "Employee deleted", data: deletedEmployee });
-    } catch (err: any) {
-      console.error(err);
-      res.status(err?.status || 500).send(err);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw { status: 422, message: "ID is not valid" };
     }
-  });
+    const foundedEmployee = await Employee.findById(id);
+    if (!foundedEmployee) throw { status: 404, message: "Employee not found" };
+
+    const deletedEmployee = await Employee.findByIdAndDelete(id);
+    res.json({ message: "Employee deleted", data: deletedEmployee });
+  } catch (err: any) {
+    console.error(err);
+    res.status(err?.status || 500).send(err);
+  }
+});
 
 app.listen(port, () => console.log("Server is running on port " + port));
