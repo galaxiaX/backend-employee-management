@@ -48,7 +48,7 @@ app.route("/employees").get(async (req, res) => {
 
 app.route("/employee/(:id)").get(async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const employee = await Employee.find({
       _id: new mongoose.Types.ObjectId(id),
     });
