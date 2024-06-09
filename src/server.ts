@@ -37,7 +37,7 @@ app.get("/check", async (req: Request, res: Response) => {
 });
 
 app
-  .route("/list")
+  .route("/list:id")
   .get(async (req, res) => {
     try {
       const employeeList = await Employee.find();
