@@ -49,10 +49,11 @@ app.route("/employees").get(async (req, res) => {
 app.route("/employee/(:id)").get(async (req, res) => {
   try {
     const { id } = req.params;
-    const employee = await Employee.find({
+    const foundedEmployee = await Employee.findOne({
       _id: new mongoose.Types.ObjectId(id),
     });
-    res.status(200).json(employee);
+    if (!foundedEmployee) throw { status: 404, message: "Employee not found" };
+    res.status(200).json({ message: "Employee found", data: foundedEmployee });
   } catch (err: any) {
     console.error(err);
     res.status(err?.status || 500).send(err);
