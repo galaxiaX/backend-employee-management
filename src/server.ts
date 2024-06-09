@@ -36,17 +36,31 @@ app.get("/check", async (req: Request, res: Response) => {
   res.json({ result: "ok" });
 });
 
+app.route("/employees").get(async (req, res) => {
+  try {
+    const employeeList = await Employee.find();
+    res.status(200).json(employeeList);
+  } catch (err: any) {
+    console.error(err);
+    res.status(err?.status || 500).send(err);
+  }
+});
+
+app.route("/employee/(:id)").get(async (req, res) => {
+  try {
+    const id = req.params.id;
+    const employee = await Employee.find({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+    res.status(200).json(employee);
+  } catch (err: any) {
+    console.error(err);
+    res.status(err?.status || 500).send(err);
+  }
+});
+
 app
-  .route("/list:id")
-  .get(async (req, res) => {
-    try {
-      const employeeList = await Employee.find();
-      res.status(200).json(employeeList);
-    } catch (err: any) {
-      console.error(err);
-      res.status(err?.status || 500).send(err);
-    }
-  })
+  .route("/create")
   .post(async (req: ReqBodyType<Omit<EmployeeType, "_id">>, res) => {
     try {
       const bodyData = req.body;
@@ -57,28 +71,32 @@ app
       console.error(err);
       res.status(err?.status || 500).send(err);
     }
-  })
-  .put(async (req: ReqBodyType<EmployeeType>, res) => {
-    try {
-      const { _id, ...rest } = req.body;
-      if (!mongoose.Types.ObjectId.isValid(_id)) {
-        throw { status: 422, message: "ID is not valid" };
-      }
+  });
 
-      const foundedList = await Employee.findById(_id);
-      if (!foundedList) throw { status: 404, message: "Employee not found" };
-
-      foundedList.set({
-        ...rest,
-      });
-      const data = await foundedList.save();
-
-      res.json({ message: "Employee updated", data });
-    } catch (err: any) {
-      console.error(err);
-      res.status(err?.status || 500).send(err);
+app.route("/update/(:id)").put(async (req: ReqBodyType<EmployeeType>, res) => {
+  try {
+    const { _id, ...rest } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      throw { status: 422, message: "ID is not valid" };
     }
-  })
+
+    const foundedList = await Employee.findById(_id);
+    if (!foundedList) throw { status: 404, message: "Employee not found" };
+
+    foundedList.set({
+      ...rest,
+    });
+    const data = await foundedList.save();
+
+    res.json({ message: "Employee updated", data });
+  } catch (err: any) {
+    console.error(err);
+    res.status(err?.status || 500).send(err);
+  }
+});
+
+app
+  .route("/delete/(:id)")
   .delete(async (req: ReqBodyType<{ _id: string }>, res) => {
     try {
       const { _id } = req.body;
