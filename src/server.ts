@@ -76,9 +76,9 @@ app
 app.route("/update/(:id)").put(async (req: ReqBodyType<EmployeeType>, res) => {
   try {
     const { _id, ...rest } = req.body;
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
-      throw { status: 422, message: "ID is not valid" };
-    }
+    // if (!mongoose.Types.ObjectId.isValid(_id)) {
+    //   throw { status: 422, message: "ID is not valid" };
+    // }
 
     const foundedList = await Employee.findById(_id);
     if (!foundedList) throw { status: 404, message: "Employee not found" };
@@ -100,9 +100,9 @@ app
   .delete(async (req: ReqBodyType<{ _id: string }>, res) => {
     try {
       const { _id } = req.body;
-      if (!mongoose.Types.ObjectId.isValid(_id)) {
-        throw { status: 422, message: "ID is not valid" };
-      }
+      // if (!mongoose.Types.ObjectId.isValid(_id)) {
+      //   throw { status: 422, message: "ID is not valid" };
+      // }
 
       const foundedEmployee = await Employee.findById(_id);
       if (!foundedEmployee)
