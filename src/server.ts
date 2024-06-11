@@ -32,7 +32,7 @@ app.use(
 );
 
 app.get("/check", async (req: Request, res: Response) => {
-  res.json({ result: "ok" });
+  res.json({ result: "ok", main_url: process.env.MAIN_URL });
 });
 
 app.route("/employees").get(async (req, res) => {
